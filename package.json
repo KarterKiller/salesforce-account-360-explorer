@@ -1,0 +1,11 @@
+{
+  "name": "salesforce-account-360-explorer",
+  "private": true,
+  "scripts": {
+    "test:unit": "lwc-jest",
+    "test:unit:coverage": "lwc-jest --coverage -- --runInBand"
+  },
+  "devDependencies": {
+    "@salesforce/sfdx-lwc-jest": "^7.1.1"
+  }
+}

@@ -1,0 +1,13 @@
+.sf/
+.sfdx/
+.codex/
+.env
+.env*
+.npmrc
+node_modules/
+coverage/
+.vendor-d3/
+test-results/
+AGENTS.md
+CODEX.md
+scripts/

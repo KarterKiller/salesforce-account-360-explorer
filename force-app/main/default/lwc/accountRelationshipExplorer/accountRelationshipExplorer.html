@@ -1,0 +1,56 @@
+<template>
+    <section class="explorer-shell">
+        <header class="hero">
+            <div>
+                <p class="eyebrow">ACCOUNT INTELLIGENCE</p>
+                <h1>Account 360 Relationship Explorer</h1>
+                <p class="hero-copy">Explore the people, pipeline and service activity surrounding an account.</p>
+            </div>
+            <lightning-button label="Reset view" icon-name="utility:refresh" onclick={resetView} disabled={isEmpty}></lightning-button>
+        </header>
+
+        <div class="controls slds-grid slds-wrap slds-gutters_small">
+            <div class="slds-col slds-size_1-of-1 slds-large-size_5-of-12">
+                <lightning-combobox label="Account" value={selectedAccountId} options={accountOptions} placeholder="Choose an accessible account" onchange={handleAccountChange}></lightning-combobox>
+            </div>
+            <div class="slds-col slds-size_1-of-1 slds-large-size_4-of-12">
+                <lightning-input type="search" label="Find in graph" value={searchTerm} onchange={handleSearch} placeholder="Search names or details"></lightning-input>
+            </div>
+            <div class="slds-col slds-size_1-of-1 slds-large-size_3-of-12 filter-control">
+                <span class="filter-label">Show relationships</span>
+                <div class="filter-buttons">
+                    <button class={contactFilterClass} data-type="Contact" onclick={toggleFilter}>Contacts</button>
+                    <button class={opportunityFilterClass} data-type="Opportunity" onclick={toggleFilter}>Opportunities</button>
+                    <button class={caseFilterClass} data-type="Case" onclick={toggleFilter}>Cases</button>
+                </div>
+            </div>
+        </div>
+
+        <template if:true={errorMessage}><div class="error-banner" role="alert">{errorMessage}</div></template>
+        <template if:true={isLoading}><lightning-spinner alternative-text="Loading account relationships" size="medium"></lightning-spinner></template>
+
+        <div class="summary-grid" aria-label="Relationship summary">
+            <article class="metric contacts"><span>Contacts</span><strong>{counts.contacts}</strong><small>People connected</small></article>
+            <article class="metric opportunities"><span>Opportunities</span><strong>{counts.opportunities}</strong><small>Pipeline records</small></article>
+            <article class="metric cases"><span>Cases</span><strong>{counts.cases}</strong><small>Service records</small></article>
+            <article class="metric total"><span>Visible graph</span><strong>{visibleNodeCount}</strong><small>Nodes in view</small></article>
+        </div>
+
+        <div class="workspace">
+            <main class="graph-card" aria-label="Account relationship graph">
+                <div class="graph-header"><div><h2>Relationship map</h2><p>Drag nodes, zoom with the wheel, and select a node for context.</p></div><div class="graph-actions"><div class="legend"><span class="account-dot"></span> Account <span class="contact-dot"></span> Contact <span class="opportunity-dot"></span> Opportunity <span class="case-dot"></span> Case</div><button class="expand-button" onclick={toggleExpanded} aria-pressed={isExpanded} title="Expand relationship map"><lightning-icon icon-name={expandIcon} size="xx-small"></lightning-icon><span>{expandLabel}</span></button></div></div>
+                <template if:true={isEmpty}><div class="empty-state"><lightning-icon icon-name="utility:share" size="large"></lightning-icon><h2>No related records yet</h2><p>Select an account with accessible Contacts, Opportunities, or Cases to explore its relationship map.</p></div></template>
+                <div class={graphCanvasClass}><svg class="graph" lwc:dom="manual" aria-label="Interactive account relationship map"></svg><div class="graph-tooltip" lwc:dom="manual" aria-hidden="true"></div></div>
+            </main>
+            <aside class="details-panel">
+                <template if:true={selectedNode}>
+                    <p class="eyebrow">SELECTED {selectedNode.type}</p><h2>{selectedNode.label}</h2><p class="details-subtitle">{selectedNode.subtitle}</p>
+                    <dl><template if:true={selectedNode.detailOne}><dt>Detail</dt><dd>{selectedNode.detailOne}</dd></template><template if:true={selectedNode.detailTwo}><dt>Additional detail</dt><dd>{selectedNode.detailTwo}</dd></template></dl>
+                    <template if:true={canExpandSelected}><lightning-button label="Explore related branches" icon-name="utility:hierarchy" onclick={expandSelected} disabled={isSelectedExpanded}></lightning-button></template>
+                    <lightning-button variant="brand" label="Open record" icon-name="utility:new_window" onclick={openSelectedRecord}></lightning-button>
+                </template>
+                <template if:false={selectedNode}><div class="selection-empty"><lightning-icon icon-name="utility:cursor" size="medium"></lightning-icon><h2>Inspect a connection</h2><p>Select any node to view its details and open its Salesforce record.</p></div></template>
+            </aside>
+        </div>
+    </section>
+</template>
